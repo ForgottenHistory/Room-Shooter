@@ -1,0 +1,21 @@
+Title: Room Shooter
+Gameplay: The player is dropped into a semi-randomized linear map and tries to get a good time. Player must kill all enemies in a room to proceed.
+It is a first person shooter and was created in 5 days.
+This is a school assignment.
+Created by Albin Fyhr
+
+Features:
+- Main Menu
+- Functional UI
+- Fast paced action
+- Fluid movement
+- Timer
+- Functional assault rifle
+- Several enemies and obstacles
+- Snakes have AI
+- Semi-randomized maps helps replayability
+- Simple artstyle
+- Music
+
+Known bugs:
+- Check Notes folder
