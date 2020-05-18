@@ -1,2 +1,2 @@
 # Room Shooter
- FPS bullet hell
+ Intense FPS bullet hell. Inspired by the Touhou games.
