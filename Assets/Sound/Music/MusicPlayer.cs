@@ -10,18 +10,23 @@ enum EMusicPlayerMode
 
 public class MusicPlayer : MonoBehaviour
 {
-    //plays random music
-    //music chosen in unity editor
+    ////////////////////////////////////////////////////////////////
 
     public List<AudioClip> music = new List<AudioClip>();
+    [SerializeField] EMusicPlayerMode mode = EMusicPlayerMode.InGame;
+
+    ////////////////////////////////////////////////////////////////
+
     AudioSource audioSource;
-    float length;
+    float length = 0.0f;
     bool active = false;
 
-    [SerializeField]
-    EMusicPlayerMode mode;
+    ////////////////////////////////////////////////////////////////
+
     public void Initialize()
     {
+        ////////////////////////////////////////////////////////////////
+        
         audioSource = GetComponent<AudioSource>();
         if( mode == EMusicPlayerMode.MainMenu )
         {
@@ -31,15 +36,22 @@ public class MusicPlayer : MonoBehaviour
         {
             audioSource.clip = music[ Random.Range( 0, music.Count ) ];
         }
+        
+        ////////////////////////////////////////////////////////////////
+
         length = audioSource.clip.length;
         active = true;
         audioSource.Play();
+        
+        ////////////////////////////////////////////////////////////////
     }
+
+    ////////////////////////////////////////////////////////////////
+
     private void Update()
     {
-        if (active)
+        if ( active == true )
         {
-            //length is a timer for when next song to play
             length -= Time.deltaTime;
             if (length <= 0)
             {
@@ -56,13 +68,19 @@ public class MusicPlayer : MonoBehaviour
             }
         }
     }
-    //test for button
+    
+    ////////////////////////////////////////////////////////////////
+
     public void NewSong()
     {
-        audioSource.clip = music[Random.Range(0, music.Count)];
+        audioSource.clip = music[ Random.Range( 0, music.Count ) ];
         length = audioSource.clip.length;
         audioSource.Play();
+
+        DebugManager.GetInstance().Print( this.ToString(), "Playing new song: " + audioSource.clip.name + " Length: " + audioSource.clip.length );
     }
+    
+    ////////////////////////////////////////////////////////////////
 
     public void SetState(bool state)
     {
@@ -70,7 +88,9 @@ public class MusicPlayer : MonoBehaviour
 
         if ( state == true )
             audioSource.Play();
-        if (state == false )
+        if ( state == false )
             audioSource.Pause();
     }
+    
+    ////////////////////////////////////////////////////////////////
 }

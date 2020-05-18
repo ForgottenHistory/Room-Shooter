@@ -83,7 +83,7 @@ public class LevelManager : MonoBehaviour
         
         map.GetComponent<NavMeshSurface>().BuildNavMesh();
 
-        DebugManager.GetInstance().Print( "GameManager", "LevelManager", "Info: Built map" );
+        DebugManager.GetInstance().Print( this.ToString(), "Info: Built map" );
        
         ////////////////////////////////////////////////////////////////
         // INITIALIZE ENEMIES
@@ -99,7 +99,7 @@ public class LevelManager : MonoBehaviour
         
         ////////////////////////////////////////////////////////////////
 
-        DebugManager.GetInstance().Print( "GameManager", "LevelManager", "Info: Initialized Enemies" );
+        DebugManager.GetInstance().Print( this.ToString(), "Info: Initialized Enemies" );
     }
     
     ////////////////////////////////////////////////////////////////

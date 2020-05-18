@@ -61,7 +61,7 @@ public class DebugManager : MonoBehaviour
         Log.SetActive( consoleOpen );
     }
 
-    public void Print(string objectName, string scriptName, string text)
+    public void Print( string scriptName, string text )
     {
 
         //////////////////////////////////////////////////
@@ -78,7 +78,7 @@ public class DebugManager : MonoBehaviour
         int minutes = System.DateTime.Now.Minute;
         int seconds = System.DateTime.Now.Second;
 
-        string message = objectName + ", " + scriptName + ".cs, " + hour.ToString() + ":"+ minutes.ToString() + ":"+ seconds.ToString() + " : " +  text;
+        string message = scriptName + ", " + hour.ToString() + ":"+ minutes.ToString() + ":"+ seconds.ToString() + " : " +  text;
 
         LogContent.transform.GetChild( textAmount - 1 ).GetComponent<Text>().text = message;
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -12,104 +13,191 @@ public struct SMisc_InitValues
 
 public class DataManager : MonoBehaviour
 {
-    //singleton
+    ///////////////////////////////////////////////////////////////////////////////
+    
     public static DataManager singleton;
 
     public PlayerController_InitValues playerController_Values;
     public SMisc_InitValues misc_Values;
 
+    public AudioMixer mixer = null;
+    
+    ///////////////////////////////////////////////////////////////////////////////
+
     private void Awake()
     {
-        if (singleton == null)
+        if ( singleton == null )
         {
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad( gameObject );
             singleton = this;
         }
-        else if (singleton != this)
+        else if ( singleton != this )
         {
-            Destroy(gameObject);
+            Destroy( gameObject );
         }
 
-        if(PlayerPrefs.HasKey("Has_DataValues") == false)
+        if ( PlayerPrefs.HasKey( "Has_DataValues" ) == false )
         {
             SetDefaultValues();
-            PlayerPrefs.SetString("Has_DataValues", "true");
+            PlayerPrefs.SetString( "Has_DataValues", "true" );
         }
         else
             LoadValues();
+
+
     }
+
+    private void Start()
+    {
+        ///////////////////////////////////////////////////////////////////////////////
+        // AUDIO
+        ///////////////////////////////////////////////////////////////////////////////
+
+        if ( PlayerPrefs.HasKey( "MasterVolume" ) == true )
+            mixer.SetFloat( "MasterVolume", Mathf.Log10( PlayerPrefs.GetFloat( "MasterVolume" ) ) * 20 );
+        else
+            PlayerPrefs.SetFloat( "MasterVolume", 1.0f );
+
+        if ( PlayerPrefs.HasKey( "MusicVolume" ) == true )
+            mixer.SetFloat( "MusicVolume", Mathf.Log10( PlayerPrefs.GetFloat( "MusicVolume" ) ) * 20 );
+        else
+            PlayerPrefs.SetFloat( "MusicVolume", 1.0f );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
 
     void LoadValues()
     {
         // load stuff from file
         BinaryFormatter bf = new BinaryFormatter();
-        if (File.Exists(Application.persistentDataPath + "/player_values.dat"))
+        if ( File.Exists( Application.persistentDataPath + "/player_values.dat" ) )
         {
-            FileStream file = File.Open(Application.persistentDataPath + "/player_values.dat", FileMode.Open);
-            playerController_Values = (PlayerController_InitValues)bf.Deserialize(file);
+            FileStream file = File.Open(Application.persistentDataPath + "/player_values.dat", FileMode.Open );
+            playerController_Values = ( PlayerController_InitValues)bf.Deserialize( file );
             file.Close();
         }
-        if (File.Exists(Application.persistentDataPath + "/misc_values.dat"))
+        if ( File.Exists( Application.persistentDataPath + "/misc_values.dat" ) )
         {
-            FileStream file = File.Open(Application.persistentDataPath + "/misc_values.dat", FileMode.Open);
-            misc_Values = (SMisc_InitValues)bf.Deserialize(file);
+            FileStream file = File.Open(Application.persistentDataPath + "/misc_values.dat", FileMode.Open );
+            misc_Values = (SMisc_InitValues)bf.Deserialize( file );
             file.Close();
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+
     public void SaveValues()
     {
         //save to file
         //binaryformatter to save lists and etc
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/player_values.dat");
-        bf.Serialize(file, playerController_Values);
+        FileStream file = File.Create( Application.persistentDataPath + "/player_values.dat" );
+        bf.Serialize( file, playerController_Values );
         file.Close();
 
-        file = File.Create(Application.persistentDataPath + "/misc_values.dat");
-        bf.Serialize(file, misc_Values);
+        file = File.Create( Application.persistentDataPath + "/misc_values.dat" );
+        bf.Serialize( file, misc_Values );
         file.Close();
     }
 
-    public void SetValue(string value, int amount)
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public bool SetValue( string value, int amount )
     {
-        switch (value)
+        switch ( value )
         {
             case "ImmunityTimeUpgrade":
-                playerController_Values.damageShieldTime += amount;
-                break;
+                if ( playerController_Values.damageShieldTime + amount > -6 )
+                {
+                    playerController_Values.damageShieldTime += amount;
+                    return true;
+                }
+                else
+                    return false;
+
             case "FallSpeedUpgrade":
+                if( playerController_Values.fallSpeed + amount > -6 )
+                {
                     playerController_Values.fallSpeed += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "JumpLimitUpgrade":
+                if( playerController_Values.jumpLimit + amount > -6 )
+                {
                     playerController_Values.jumpLimit += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "JumpHeightUpgrade":
+                if( playerController_Values.jumpHeight + amount > -6 )
+                {
                     playerController_Values.jumpHeight += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "SpeedUpgrade":
+                if( playerController_Values.movementSpeed + amount > -6 )
+                {
                     playerController_Values.movementSpeed += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "JetpackChargeUpgrade":
+                if( playerController_Values.flyingFill + amount > -6 )
+                {
                     playerController_Values.flyingFill += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "JetpackUseRateUpgrade":
+                if( playerController_Values.flyingUseRate + amount > -6 )
+                {
                     playerController_Values.flyingUseRate += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "JetpackRecovoryRateUpgrade":
+                if( playerController_Values.flyingRecovoryRate + amount > -6 )
+                {
                     playerController_Values.flyingRecovoryRate += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             case "JetpackPowerUpgrade":
+                if( playerController_Values.flyingPower + amount > -5 )
+                {
                     playerController_Values.flyingPower += amount;
-                break;
+                    return true;
+                }
+                else
+                    return false;
+
             default:
-                break;
+                return false;
         }
     }
 
-    public int GetValue(string value)
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public int GetValue( string value )
     {
-        switch (value)
+        switch ( value )
         {
             case "ImmunityTimeUpgrade":
                 return playerController_Values.damageShieldTime;
@@ -136,6 +224,8 @@ public class DataManager : MonoBehaviour
         return 0;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
+
     public void SetDefaultValues()
     {
         playerController_Values.damageShieldTime = 1;
@@ -153,10 +243,14 @@ public class DataManager : MonoBehaviour
         SaveValues();
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
+
     public void DeleteData()
     {
-        File.Delete(Application.persistentDataPath + "/player_values.dat");
-        File.Delete(Application.persistentDataPath + "/misc_values.dat");
+        File.Delete( Application.persistentDataPath + "/player_values.dat" );
+        File.Delete( Application.persistentDataPath + "/misc_values.dat" );
         SaveValues();
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
 }

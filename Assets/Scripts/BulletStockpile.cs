@@ -58,7 +58,7 @@ public class BulletStockpile : MonoBehaviour
             if ( toMake[ keys[ i ] ] > 2000 )
                 toMake[ keys[ i ] ] = 2000;
 
-            DebugManager.GetInstance().Print( gameObject.name, this.ToString(), "To make: " + keys[i] + " " + toMake[ keys[ i ] ] );
+            DebugManager.GetInstance().Print( this.ToString(), "To make: " + keys[i] + " " + toMake[ keys[ i ] ] );
             inventory.Add(keys[i], 0);
             created.Add(keys[i], 0);
 
@@ -87,7 +87,7 @@ public class BulletStockpile : MonoBehaviour
 
         ////////////////////////////////////////////////////////////////
         
-        DebugManager.GetInstance().Print( gameObject.name, this.ToString(), "Info: Set bullet limits" );
+        DebugManager.GetInstance().Print( this.ToString(), "Info: Set bullet limits" );
     }
 
     //give bullet to enemy or obstacle

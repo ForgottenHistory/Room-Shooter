@@ -24,7 +24,8 @@ public class BossEnemy : Enemy
     Animator anim = null;
     GameObject cam = null;
     BulletStockpile stockpile = null;
-    
+    GameManager gameManager = null;
+
     ////////////////////////////////////////////////////////////////
 
     Dictionary<string, int> bullets = new Dictionary<string, int>();
@@ -33,6 +34,7 @@ public class BossEnemy : Enemy
     List<Transform> points = new List<Transform>();
     
     int numberOfAttackAnims = 0;
+    bool activated = false;
     
     ////////////////////////////////////////////////////////////////
 
@@ -55,6 +57,7 @@ public class BossEnemy : Enemy
         }
 
         stockpile = GameObject.Find( "Bullets" ).GetComponent<BulletStockpile>();
+        gameManager = GameObject.Find( "GameManager" ).GetComponent<GameManager>();
         cam = Camera.main.gameObject;
 
         ////////////////////////////////////////////////////////////////
@@ -105,14 +108,17 @@ public class BossEnemy : Enemy
     //shoot bullet forward
     public override void Shoot(int shootPoint)
     {
-        //iterate through shootpoints
         foreach (Transform sp in points[shootPoint])
         {
+            ////////////////////////////////////////////////////////////////
+            
             GameObject bullet = stockpile.GetBullet(bulletPrefabs[shootPoint].name);
             bullet.transform.position = sp.position;
             bullet.transform.rotation = sp.rotation;
             
-            if (bullet.GetComponent<EnemyBullet>())
+            ////////////////////////////////////////////////////////////////
+            
+            if (bullet.GetComponent<EnemyBullet>() )
             {
                 bullet.GetComponent<EnemyBullet>().Activate(bulletSpeeds[shootPoint]);
             }
@@ -120,6 +126,8 @@ public class BossEnemy : Enemy
             {
                 bullet.transform.GetChild(0).GetComponent<EnemyBullet>().Activate(bulletSpeeds[shootPoint]);
             }
+            
+            ////////////////////////////////////////////////////////////////
         }
     }
 
@@ -128,21 +136,30 @@ public class BossEnemy : Enemy
     //enemy gets damaged
     public override void Damaged(float damage, float impact)
     {
+        ////////////////////////////////////////////////////////////////
+        
         health -= damage;
         BossHealthMeter.value = health;
         BossHealthCounter.text = health.ToString();
         
-        if (health <= 0)
+        ////////////////////////////////////////////////////////////////
+
+        if ( health <= 0)
         {
             tag = "Untagged";
-            transform.parent.parent.GetChild(0).GetComponent<RoomArea>().EnemyDies();
+            transform.parent.parent.GetChild( 0 ).GetComponent<RoomArea>().EnemyDies();
             ChangeColor(transform);
-            anim.SetBool("dead", true);
-            anim.Play("Dying");
-            BossHealthMeter.gameObject.SetActive(false);
+            
+            anim.SetBool( "dead", true );
+            anim.Play( "Dying" );
+            
+            BossHealthMeter.gameObject.SetActive( false );
             BossHealthNameText.text = " ";
-            Destroy(anim);
+            gameManager.Win();
+            Destroy( anim );
         }
+        
+        ////////////////////////////////////////////////////////////////
     }
 
     ////////////////////////////////////////////////////////////////
@@ -150,48 +167,52 @@ public class BossEnemy : Enemy
     //change color on all children
     void ChangeColor(Transform parent)
     {
-        foreach (Transform child in parent)
+        foreach ( Transform child in parent )
         {
-            if (child.GetComponent<Renderer>())
+            if ( child.GetComponent<Renderer>() )
             {
                 child.GetComponent<Renderer>().material.color = Color.cyan;
             }
-            ChangeColor(child);
+            ChangeColor( child );
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////
 
-    void FindShootPoints(Transform parent)
+    void FindShootPoints( Transform parent )
     {
-        foreach (Transform child in parent)
+        foreach ( Transform child in parent )
         {
-            if (child.name == "ShootPoints")
+            if ( child.name == "ShootPoints" )
             {
-                   shootPoints.Add(child);
+                shootPoints.Add( child );
             }
-            FindShootPoints(child);
+            FindShootPoints( child );
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////
 
     public override void Activate()
     {
+        if ( activated == true )
+            return;
+
+        activated = true;
         BossHealthMeter.maxValue = health;
         BossHealthMeter.value = health;
-        BossHealthMeter.gameObject.SetActive(true);
+        BossHealthMeter.gameObject.SetActive( true );
         BossHealthCounter.text = health.ToString();
         BossHealthNameText.text = name.ToUpper();
-        anim.SetBool("activated", true);
+        anim.SetBool( "activated", true );
     }
-    
+
     ////////////////////////////////////////////////////////////////
 
     public void RandomizeAnimation()
     {
-        int number = Random.Range(0, numberOfAttackAnims);
-        anim.SetInteger("attack_index", number);
+        int number = Random.Range( 0, numberOfAttackAnims );
+        anim.SetInteger( "attack_index", number );
     }
 
     ////////////////////////////////////////////////////////////////

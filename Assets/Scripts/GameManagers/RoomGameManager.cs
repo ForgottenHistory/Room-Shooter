@@ -38,25 +38,27 @@ public class RoomGameManager : GameManager
         clickBtn.SetActive(false);
         GetComponent<MusicPlayer>().Initialize();
     }
+
     //check if win or proceed
     public override void Cleared()
     {
         if (room >= length)
         {
             Win();
-            DebugManager.GetInstance().Print( "GameManager", "Room_GameManager", "Info: Player win");
+            DebugManager.GetInstance().Print( this.ToString(), "Info: Player win");
         }
         else
         {
             proceedText.text = "PROCEED TO NEXT ROOM";
-            DebugManager.GetInstance().Print( "GameManager", "Room_GameManager", "Info: Cleared room " + room);
+            DebugManager.GetInstance().Print( this.ToString(), "Info: Cleared room " + room);
         }
     }
+
     //change room
     public void ChangeRoom(GameObject newDoor)
     {
         room++;
-        DebugManager.GetInstance().Print( "GameManager", "Room_GameManager", "Info: Walked into room " + room);
+        DebugManager.GetInstance().Print( this.ToString(), "Info: Walked into room " + room);
         proceedText.GetComponent<Text>().text = " ";
         //fix error for first room
         if(currentDoor != null)
@@ -65,6 +67,7 @@ public class RoomGameManager : GameManager
         }
         currentDoor = newDoor;
     }
+
     //player win
     public override void Win()
     {

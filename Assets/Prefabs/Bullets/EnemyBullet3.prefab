@@ -89,6 +89,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -144,8 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dd1638450d3da5439005475c47af6db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.8
-  rotationTime: 4
+  speed: 0.1
+  rotationTime: 2
   deathTimer: 10000
 --- !u!65 &6503887906062791393
 BoxCollider:
