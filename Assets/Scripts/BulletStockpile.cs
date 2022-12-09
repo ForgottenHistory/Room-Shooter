@@ -5,20 +5,25 @@ using UnityEngine;
 
 public class BulletStockpile : MonoBehaviour
 {
-    //stockpile for all enemy bullets
-    //enemy loans bullet to shoot
-    //shared stockpile creates less gameobjects than individual stockpiles
-    //this method decreased load times by a large margin
-    
     ////////////////////////////////////////////////////////////////
-    
+    //
+    //                      BULLET STOCKPILE
+    //
+    // stockpile for all enemy bullets
+    // enemy loans bullet to shoot
+    // shared stockpile creates less gameobjects than individual stockpile
+    //
+    ////////////////////////////////////////////////////////////////
+
     Dictionary<string, GameObject> prefabBullets = new Dictionary<string, GameObject>(); //prefab bullets
     Dictionary<string, int> toMake = new Dictionary<string, int>(); //string name, int amount to make
     Dictionary<string, Dictionary<string, int>> users = new Dictionary<string, Dictionary<string, int>>(); //room, bullet, users
     Dictionary<string, int> created = new Dictionary<string, int>(); //string name, int amount to make
     Dictionary<string, int> inventory = new Dictionary<string, int>(); //string name, int currentbullet
     List<string> rooms = new List<string>();
-    
+
+    ////////////////////////////////////////////////////////////////
+    // INITIALIZE
     ////////////////////////////////////////////////////////////////
 
     public void Initialize()
@@ -55,7 +60,7 @@ public class BulletStockpile : MonoBehaviour
         {
             toMake[keys[i]] = Mathf.RoundToInt(toMake[keys[i]] * mostUsed[i]);
             toMake[keys[i]] += 200;
-            if ( toMake[ keys[ i ] ] > 2000 )
+            if ( toMake[ keys[ i ] ] > 2000 ) // hard limit of 2000 bullets of this type can exist
                 toMake[ keys[ i ] ] = 2000;
 
             DebugManager.GetInstance().Print( this.ToString(), "To make: " + keys[i] + " " + toMake[ keys[ i ] ] );
@@ -88,20 +93,33 @@ public class BulletStockpile : MonoBehaviour
         ////////////////////////////////////////////////////////////////
         
         DebugManager.GetInstance().Print( this.ToString(), "Info: Set bullet limits" );
+        
+        ////////////////////////////////////////////////////////////////
     }
 
-    //give bullet to enemy or obstacle
+    ////////////////////////////////////////////////////////////////
+    // GET BULLET
+    ////////////////////////////////////////////////////////////////
+
+    // Find a bullet and give it to enemy or obstacle
     public GameObject GetBullet(string name)
     {
+        ////////////////////////////////////////////////////////////////
+        
         GameObject bullet;
-        inventory[name] += 1; //inventory[name] = currenbullet
-        //makes inventory loop
+        inventory[name] += 1;
+        
+        // Inventory loop
         if (inventory[name] >= toMake[name] - 1)
         {
             inventory[name] = 0;
         }
-        //if it exists
-        if (created[name] >= toMake[name])
+        
+        ////////////////////////////////////////////////////////////////
+        // Check if bullets are created to the limit
+        // If yes get one, else create one
+
+        if ( created[name] >= toMake[name])
         {
             bullet = transform.Find(name + "list").transform.GetChild(inventory[name]).gameObject;
         }
@@ -109,20 +127,24 @@ public class BulletStockpile : MonoBehaviour
         {
             bullet = Instantiate(prefabBullets[name]);
             bullet.transform.parent = transform.Find(name + "list").transform;
-            //toMake[name] += 1;
             inventory[name]++;
             created[name]++;
         }
+
         return bullet;
+        
+        ////////////////////////////////////////////////////////////////
     }
-    
+
+    ////////////////////////////////////////////////////////////////
+    // ADD BULLETS TO MAKE
     ////////////////////////////////////////////////////////////////
 
     public void AddBullet(string name, int amount, float firerate, float bulletSpeed, string room)
     {
         ////////////////////////////////////////////////////////////////
-        
-        if ( toMake.ContainsKey( name) )
+
+        if ( toMake.ContainsKey( name ) )
         {
             if( toMake[ name ] < (500 / bulletSpeed) * firerate)
             {

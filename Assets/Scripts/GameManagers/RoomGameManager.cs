@@ -5,44 +5,83 @@ using UnityEngine.UI;
 
 public class RoomGameManager : GameManager
 {
-    //script keeps track of player, weapon, level and misc
+    ////////////////////////////////////////////////////////////////
+    //
+    //                     GAME MANAGER
+    //
+    // Keep track of player & level
+    //
+    ////////////////////////////////////////////////////////////////
 
-    public int length = 6; //length of map
+    ////////////////////////////////////////////////////////////////
+    // PUBLIC VARIABLES
+    ////////////////////////////////////////////////////////////////
+
+    public int length = 6; // How many rooms to create (length of the whole level)
+
+    // UI
     [SerializeField] Text proceedText = null;
     [SerializeField] GameObject winBtn = null;
     [SerializeField] GameObject loadingScreen = null;
     [SerializeField] GameObject clickBtn = null;
-    
-    GameObject currentDoor = null;
-    int room = 0; //currentroom
 
-    //initializes different scripts
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE VARIABLES
+    ////////////////////////////////////////////////////////////////
+
+    GameObject currentDoor = null; // Door at the current room
+    int inRoom = 0; // Player in this room
+
+    ////////////////////////////////////////////////////////////////
+    // INITIALIZE  
+    ////////////////////////////////////////////////////////////////
+    
     private void Awake()
     {
+        // UI
         GameObject.Find( "DebugManager" ).GetComponent<DebugManager>().Initialize();
         proceedText.gameObject.SetActive(false);
         loadingScreen.SetActive(true);
+
+        // 1
         Createlevel();
+        
+        // 2
         Invoke("CreateBullets", 1f);
     }
-    //player click startbutton
+
+    ////////////////////////////////////////////////////////////////
+    // START GAME
+    ////////////////////////////////////////////////////////////////
+
     public override void StartGame() 
     {
+        // Player
         //GameObject.Find("Player").GetComponent<PlayerController>().Initialize();
-        GameObject.Find("TimerText").GetComponent<Timer>().active = true;
         currentWeapon.active = true;
+
+        // Camera & Cursor
         Camera.main.GetComponent<CameraController>().ChangeState(true);
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        // UI
         proceedText.gameObject.SetActive(true);
         clickBtn.SetActive(false);
+
+        // Initialize components
         GetComponent<MusicPlayer>().Initialize();
+        GameObject.Find("TimerText").GetComponent<Timer>().active = true;
     }
 
-    //check if win or proceed
+    ////////////////////////////////////////////////////////////////
+    // ROOM CLEARED
+    ////////////////////////////////////////////////////////////////
+
     public override void Cleared()
     {
-        if (room >= length)
+        // Check if at level lenght, if yes WIN
+        if ( inRoom >= length)
         {
             Win();
             DebugManager.GetInstance().Print( this.ToString(), "Info: Player win");
@@ -50,17 +89,21 @@ public class RoomGameManager : GameManager
         else
         {
             proceedText.text = "PROCEED TO NEXT ROOM";
-            DebugManager.GetInstance().Print( this.ToString(), "Info: Cleared room " + room);
+            DebugManager.GetInstance().Print( this.ToString(), "Info: Cleared room " + inRoom );
         }
     }
 
-    //change room
+    ////////////////////////////////////////////////////////////////
+    // WALK TO NEXT ROOM
+    ////////////////////////////////////////////////////////////////
+
     public void ChangeRoom(GameObject newDoor)
     {
-        room++;
-        DebugManager.GetInstance().Print( this.ToString(), "Info: Walked into room " + room);
+        inRoom++;
+        DebugManager.GetInstance().Print( this.ToString(), "Info: Walked into room " + inRoom );
         proceedText.GetComponent<Text>().text = " ";
-        //fix error for first room
+       
+        // fix error for first room
         if(currentDoor != null)
         {
             currentDoor.SetActive(true);
@@ -68,24 +111,39 @@ public class RoomGameManager : GameManager
         currentDoor = newDoor;
     }
 
-    //player win
+    ////////////////////////////////////////////////////////////////
+    // WIN
+    ////////////////////////////////////////////////////////////////
+
     public override void Win()
     {
+        // UI
         winBtn.SetActive(true);
         proceedText.gameObject.SetActive(false);
+        GameObject.Find("TimerText").GetComponent<Timer>().active = false;
+
+        // Camera & Cursor
         Camera.main.GetComponent<CameraController>().ChangeState(false);
         Cursor.visible = true;
-        GameObject.Find("TimerText").GetComponent<Timer>().active = false;
         Cursor.lockState = CursorLockMode.None;
     }
+
+    ////////////////////////////////////////////////////////////////
+    // CREATE
+    ////////////////////////////////////////////////////////////////
 
     void Createlevel()
     {
         GetComponent<LevelManager>().CreateRoomLevel(length);
     }
+    
+    ////////////////////////////////////////////////////////////////
+    
     void CreateBullets()
     {
         GameObject.Find("Bullets").GetComponent<BulletStockpile>().Initialize();
         loadingScreen.SetActive(false);
     }
+    
+    ////////////////////////////////////////////////////////////////
 }

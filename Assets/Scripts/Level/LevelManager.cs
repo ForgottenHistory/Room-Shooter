@@ -4,11 +4,19 @@ using UnityEngine;
 using UnityEngine.AI;
 public class LevelManager : MonoBehaviour
 {
-    //creates a map from rooms
+    ////////////////////////////////////////////////////////////////
+    //                  LEVEL MANAGER
+    //
+    //  More like a level creator, but yea ツ
+    //  Creates a map from "rooms"
+    //
+    ////////////////////////////////////////////////////////////////
 
-    //size of each room
+    //x*y size of ALL rooms
     const int roomSize = 500;
-    
+
+    ////////////////////////////////////////////////////////////////
+
     public void CreateRoomLevel(int length)
     {
         ////////////////////////////////////////////////////////////////
@@ -31,6 +39,7 @@ public class LevelManager : MonoBehaviour
         // GET AVAILABLE ROOMS
         ////////////////////////////////////////////////////////////////
 
+        // Loop through map objects parents
         foreach ( Transform t in map.transform)
         {
             if (t.GetComponent<Room>().startRoom || t.GetComponent<Room>().endRoom)
@@ -47,7 +56,7 @@ public class LevelManager : MonoBehaviour
         // DESTROY AND RECREATE MAP
         ////////////////////////////////////////////////////////////////
 
-        Destroy( map);
+        Destroy( map );
         map = new GameObject();
         map.name = "Map";
         //navmeshsurface to rebuild navmesh
@@ -63,6 +72,7 @@ public class LevelManager : MonoBehaviour
             bool special = false;
             foreach(GameObject go in specialRooms)
             {
+                // Check if any room pos is at this pos, if yes spawn
                 if (go.GetComponent<Room>().GetPosY() == vec.z / roomSize)
                 {
                     GameObject room = Instantiate(go, vec, Quaternion.identity);
@@ -72,6 +82,7 @@ public class LevelManager : MonoBehaviour
                 }
             }
 
+            // Spawn random room if no room has this pos
             if(special == false)
             {
                 GameObject room = Instantiate(rooms[Random.Range(0, rooms.Count)], vec, Quaternion.identity);
@@ -81,6 +92,7 @@ public class LevelManager : MonoBehaviour
             counter++;
         }
         
+        // Use NavMeshComponents to create a navmesh
         map.GetComponent<NavMeshSurface>().BuildNavMesh();
 
         DebugManager.GetInstance().Print( this.ToString(), "Info: Built map" );
@@ -101,7 +113,10 @@ public class LevelManager : MonoBehaviour
 
         DebugManager.GetInstance().Print( this.ToString(), "Info: Initialized Enemies" );
     }
-    
+
+    ////////////////////////////////////////////////////////////////
+    // POINT DEFENSE
+    // A scrapped gamemode
     ////////////////////////////////////////////////////////////////
 
     public void CreatePointDefenseLevel(int length)
@@ -112,8 +127,6 @@ public class LevelManager : MonoBehaviour
 
         //navmeshsurface to rebuild navmesh
         map.AddComponent<NavMeshSurface>();
-
-        //rebuild navmesh
         map.GetComponent<NavMeshSurface>().BuildNavMesh();
 
         Debug.Log("Info: Built map");

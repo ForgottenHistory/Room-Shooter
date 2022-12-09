@@ -4,12 +4,22 @@ using UnityEngine;
 
 public class PlayerUsableScript : MonoBehaviour
 {
-    //use usables script
-    //use the one nearest
+    ////////////////////////////////////////////////////////////////
+    //
+    //                      PLAYER USABLE
+    //
+    // use the one nearest
+    //
+    ////////////////////////////////////////////////////////////////
 
     Usable usable;
     [SerializeField]
     GameObject useText;
+
+    ////////////////////////////////////////////////////////////////
+    // UPDATE
+    ////////////////////////////////////////////////////////////////
+
     private void Update()
     {
         //hold usable
@@ -33,6 +43,12 @@ public class PlayerUsableScript : MonoBehaviour
         }
     }
 
+    ////////////////////////////////////////////////////////////////
+    //
+    //                      TRIGGERS
+    //
+    ////////////////////////////////////////////////////////////////
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.GetComponent<Usable>() != null)
@@ -51,6 +67,9 @@ public class PlayerUsableScript : MonoBehaviour
             }
         }
     }
+
+    ////////////////////////////////////////////////////////////////
+
     private void OnTriggerStay(Collider other)
     {
         if (other.GetComponent<Usable>() != null)
@@ -69,8 +88,13 @@ public class PlayerUsableScript : MonoBehaviour
             }
         }
     }
+
+    ////////////////////////////////////////////////////////////////
+
     private void OnTriggerExit(Collider other)
     {
         usable = null;
     }
+    
+    ////////////////////////////////////////////////////////////////
 }

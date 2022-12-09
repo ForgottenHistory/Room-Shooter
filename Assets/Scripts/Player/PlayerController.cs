@@ -21,11 +21,20 @@ public struct PlayerController_InitValues
 public class PlayerController : MonoBehaviour
 {
 
-    //playercontroller from Top Quality Arena
-    //able to walk, jump, crouch
-    //a bit updated
+    ////////////////////////////////////////////////////////////////
+    //
+    //                      PLAYER CONTROLLER
+    //
+    // playercontroller from Top Quality Arena
+    // walk, jump, crouch
+    // a bit updated
+    //
+    ////////////////////////////////////////////////////////////////
 
-    //variables
+    ////////////////////////////////////////////////////////////////
+    // PUBLIC VARIABLES
+    ////////////////////////////////////////////////////////////////
+
     [Header("Variables")]
     public int health = 100;
     public float movementSpeed = 50;
@@ -34,33 +43,42 @@ public class PlayerController : MonoBehaviour
     public float fallSpeed = 1;
     public float damageShieldTime = 1;
 
-    bool crouching = false;
-    [HideInInspector]
-    public bool moving = false;
-    bool active = true;
-    bool ableToBeDamaged = true;
-
-    [Header("Jetpack")]
+    [Header( "Jetpack" )]
     public float flyingFill = 1.0f;
     public float flyingUseRate = 1.0f;
     public float flyingRecovoryRate = 1.0f;
     public float flyingPower = 2.0f;
-    float flyingFillMax;
-    bool flying = false;
 
-    [Header("Game Objects")]
+    [Header( "Game Objects" )]
     public GameObject playerPerspectiveCamera;
     public GameObject hurtEffect;
     public GameObject loseBtn;
     public Text healthText;
     public Slider flyingSlider;
 
-    //scripts, components
+    ////////////////////////////////////////////////////////////////'
+    // PRIVATE VARIABLES
+    ////////////////////////////////////////////////////////////////
+
+    [HideInInspector]
+    public bool moving = false;
+    bool crouching = false;
+    bool active = true;
+    bool ableToBeDamaged = true;
+    bool flying = false;
+
+    float flyingFillMax;
+    
+    // Components
     Rigidbody rb;
     BoxCollider boxCol;
     GameManager gameManager;
     DataManager dataManager;
     Plane plane = new Plane(Vector3.up, Vector3.zero);
+
+    ////////////////////////////////////////////////////////////////
+    // INITIALIZE
+    ////////////////////////////////////////////////////////////////
 
     void Start()
     {
@@ -79,7 +97,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
+    ////////////////////////////////////////////////////////////////
+    // UPDATE
+    ////////////////////////////////////////////////////////////////
 
     void Update()
     {
@@ -95,11 +115,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    
+    ////////////////////////////////////////////////////////////////
 
     void Input_FirstPerson()
     {
-        //basic movement
-        if (Input.GetKey(KeyCode.W))
+        ////////////////////////////////////////////////////////////////
+        // WASD Movement
+
+        if ( Input.GetKey(KeyCode.W))
         {
             transform.position += transform.forward * movementSpeed * Time.deltaTime;
             moving = true;
@@ -119,10 +143,12 @@ public class PlayerController : MonoBehaviour
             transform.position -= transform.right * movementSpeed * Time.deltaTime;
             moving = true;
         }
+        
+        ////////////////////////////////////////////////////////////////
+        // Jump
+        // Must be near to ground (near, not on)
 
-        //jump
-        //must be near to ground (near, not on)
-        if (Input.GetKeyDown(KeyCode.Space)
+        if ( Input.GetKeyDown(KeyCode.Space)
             && Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), jumpLimit))
         {
             rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
@@ -131,6 +157,9 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity += Vector3.down * fallSpeed;
         }
+        
+        ////////////////////////////////////////////////////////////////
+        // Jetpack
 
         flying = true;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), jumpLimit))
@@ -153,12 +182,12 @@ public class PlayerController : MonoBehaviour
             flyingFill += Time.deltaTime * flyingRecovoryRate;
             flyingSlider.value = flyingFill;
         }
+        
+        ////////////////////////////////////////////////////////////////
+        // Crouch mode
+        // Move slower. Shorter boxcollider
 
-        //crouch mode
-        //will move slower
-        //shorter boxcollider
-        //player will have to move to make room for new collider
-        if (Input.GetKeyDown(KeyCode.LeftControl) && crouching == false)
+        if ( Input.GetKeyDown(KeyCode.LeftControl) && crouching == false)
         {
             boxCol.size = new Vector3(1, 1, 1);
             transform.position = new Vector3(transform.position.x, transform.position.y - 0.3f, transform.position.z);
@@ -172,6 +201,8 @@ public class PlayerController : MonoBehaviour
             crouching = !crouching;
             movementSpeed += 5;
         }
+        
+        ////////////////////////////////////////////////////////////////
 
         //make player y rotation same as camera
         transform.rotation = Quaternion.Euler(0, playerPerspectiveCamera.transform.eulerAngles.y, 0);
@@ -181,15 +212,27 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(notMoving());
         }
 
+        ////////////////////////////////////////////////////////////////
+        // DEBUG
+        
         if ( Input.GetKeyUp( KeyCode.P ) )
         {
             DebugManager.GetInstance().ChangeConsoleState();
         }
+        
+        ////////////////////////////////////////////////////////////////
     }
+
+    ////////////////////////////////////////////////////////////////
+    // INPUT TOP DOWN VIEW
+    // Scrapped gamemode
+    ////////////////////////////////////////////////////////////////
 
     void Input_TopDown()
     {
-        //Look at Mouse
+        ////////////////////////////////////////////////////////////////
+        // Look at Mouse
+        
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         float distance;
@@ -201,8 +244,10 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, rotation, 0);
         }
 
-        //basic movement
-        if (Input.GetKey(KeyCode.W))
+        ////////////////////////////////////////////////////////////////
+        // WASD Movement
+
+        if ( Input.GetKey(KeyCode.W))
         {
             transform.position += Vector3.forward * movementSpeed * Time.deltaTime;
             moving = true;
@@ -222,13 +267,21 @@ public class PlayerController : MonoBehaviour
             transform.position -= Vector3.right * movementSpeed * Time.deltaTime;
             moving = true;
         }
+        
+        ////////////////////////////////////////////////////////////////
 
-        if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A))
+        if ( Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A))
         {
             StartCoroutine(notMoving());
         }
+        
+        ////////////////////////////////////////////////////////////////
     }
-    //damage player
+
+    ////////////////////////////////////////////////////////////////
+    // DAMAGE PLAYER
+    ////////////////////////////////////////////////////////////////
+
     public void Damage(int amount)
     {
         if (ableToBeDamaged)
@@ -250,16 +303,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    ////////////////////////////////////////////////////////////////
+    // ACTIVATE & DISABLE PLAYER
+    ////////////////////////////////////////////////////////////////
+
     public void ChangeState(bool newState)
     {
         active = newState;
     }
+
+    ////////////////////////////////////////////////////////////////
+    // IENUMERATORS
+    ////////////////////////////////////////////////////////////////
 
     IEnumerator notMoving()
     {
         yield return new WaitForSeconds(0.6f);
         moving = false;
     }
+    
+    ////////////////////////////////////////////////////////////////
 
     IEnumerator damageShield()
     {
@@ -267,7 +330,11 @@ public class PlayerController : MonoBehaviour
         ableToBeDamaged = true;
     }
 
-    void CheckForUpgrades(PlayerController_InitValues values)
+    ////////////////////////////////////////////////////////////////
+    // CHECK FOR UPGRADES
+    ////////////////////////////////////////////////////////////////
+
+    void CheckForUpgrades( PlayerController_InitValues values)
     {
 
         if (PlayerPrefs.HasKey("ImmunityTimeUpgrade"))
